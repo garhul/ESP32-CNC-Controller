@@ -1,0 +1,241 @@
+name: "GECC - XXYZ CNC config"
+board: "Garhul's ESP32-CNC-CONTROLLER"
+meta: "GECC - Revision 2.0.0"
+
+# Pin mapping
+#Isolated inputs
+# IN_A -> gpio.36
+# IN_B -> gpio.39
+# IN_C -> gpio.32 
+# IN_D -> gpio.33
+# IN_E -> gpio.34
+# IN_F -> gpio.35
+# IN_G -> gpio.25
+# IN_H -> gpio.26
+
+# Power outputs (open drain, n channel mosfet)
+# P_OUT_A -> i2so.18
+# P_OUT_B -> i2so.19
+# P_OUT_C -> i2so.20
+# P_OUT_D -> i2so.21
+# P_OUT_E -> i2so.22
+# P_OUT_F -> i2so.23
+# P_OUT_G -> i2so.24
+# P_OUT_H -> i2so.25
+# P_OUT_I -> i2so.26
+# P_OUT_J -> i2so.27
+# P_OUT_K -> i2so.28
+# P_OUT_L -> i2so.29
+# P_OUT_M -> i2so.30
+# P_OUT_N -> i2so.31
+
+# I2SO
+# bck -> gpio.22   clock
+# data -> gpio.21  data 
+# ws_pin -> gpio.4 latch
+
+# VFD outputs
+# VFD_PWM -> gpio.27       vfd pwm output
+# VFD_FWD_SIG -> gpio.14     vfd forward signal
+# VFD_REV_SIG -> gpio.12     vfd reverse signal
+
+# Axes :
+
+# X Step i2so.0
+# X Dir i2so.1
+# X En i2so.2
+
+# X' Step i2so.3
+# X' Dir i2so.4
+# X' En i2so.5
+
+# Y Step i2so.6
+# Y Dir i2so.7
+# Y En i2so.8
+
+# Z Step i2so.9
+# Z Dir i2so.10
+# Z En i2so.11
+
+# A Step i2so.12
+# A Dir i2so.13
+# A En i2so.14
+
+# B Step i2so.15
+# B Dir i2so.16
+# B En i2so.17
+
+
+# Expansion port 
+#  A-> gpio.13
+#  B-> gpio.0
+#  C-> gpio.2
+#  d-> gpio.15
+
+# SD card SPI port
+# MISO -> gpio.19
+# MOSI -> gpio.23
+# SCK -> gpio.18
+# SS -> gpio.5
+
+
+## ---------------------------- CNC Config --------------------------- ##
+
+i2so:
+  bck_pin: gpio.22
+  data_pin: gpio.21
+  ws_pin: gpio.4
+
+# spi:
+#   miso_pin: gpio.19
+#   mosi_pin: gpio.23
+#   sck_pin: gpio.18
+
+# Uncomment to use SD Card
+#sdcard:
+#  cs_pin: gpio.5
+#  card_detect_pin: NO_PIN
+
+control:
+  safety_door_pin: NO_PIN
+  reset_pin: NO_PIN
+  feed_hold_pin: NO_PIN
+  cycle_start_pin: NO_PIN
+  macro0_pin: NO_PIN
+  macro1_pin: NO_PIN
+  macro2_pin: NO_PIN
+  macro3_pin: NO_PIN
+
+start:
+  must_home: true
+  deactivate_parking: false
+  check_limits: true
+
+# VFD outputs
+# VFD_PWM -> gpio.27       vfd pwm output
+# VFD_FWD_SIG -> gpio.14     vfd forward signal
+# VFD_REV_SIG -> gpio.12     vfd reverse signal
+10V:
+  forward_pin: gpio.14
+  reverse_pin: gpio.12
+  pwm_hz: 5000
+  output_pin: gpio.27
+  enable_pin: NO_PIN
+  direction_pin: NO_PIN
+  disable_with_s0: true
+  s0_with_disable: true
+  spinup_ms: 0
+  spindown_ms: 0
+  tool_num: 0
+  speed_map: 0=0.000% 1000=0.000% 24000=100.000%
+  off_on_alarm: true
+
+coolant:
+  # P_OUT_A -> i2so.18
+  # P_OUT_B -> i2so.19
+  flood_pin: i2so.18
+  mist_pin:  i2so.19
+
+user_outputs: 
+  # P_OUT_C -> i2so.20 -> vacuum
+  digital0_pin: i2so.20  
+  digital1_pin: i2so.21
+  digital2_pin: i2so.22
+  digital3_pin: i2so.23
+  digital4_pin: i2so.24
+  digital5_pin: i2so.25
+  digital6_pin: i2so.26
+  digital7_pin: i2so.27
+  digital8_pin: i2so.28
+  digital9_pin: i2so.29
+  digital10_pin: i2so.30
+  digital11_pin: i2so.31
+
+# status_outputs:
+#   report_interval_ms: 500
+#   idle_pin: gpio.26
+#   run_pin: gpio.4
+#   hold_pin: gpio.16
+#   alarm_pin: gpio.27
+
+probe:
+  # IN_H -> gpio.26
+  pin: gpio.26:low 
+
+stepping:
+  engine: I2S_STREAM
+  idle_ms: 255
+  dir_delay_us: 1
+  pulse_us: 4
+  disable_delay_us: 0
+
+axes:
+  X:
+    steps_per_mm: 800
+    max_rate_mm_per_min: 3000
+    acceleration_mm_per_sec2: 25
+    max_travel_mm: 600
+    soft_limits: true
+    homing:
+      cycle: 2
+      mpos_mm: 0
+      positive_direction: false
+      seek_mm_per_min: 50
+      seek_scaler: 1
+
+    motor0:
+      # IN_A -> gpio.39
+      limit_neg_pin: gpio.39:low 
+      
+      standard_stepper:
+        # X Step i2so.0
+        step_pin: i2so.1 
+        # X Dir i2so.1
+        direction_pin: i2so.0
+         # X En i2so.2
+        disable_pin: i2so.2
+
+    motor1:    
+      # IN_B -> gpio.36
+      limit_neg_pin: gpio.36:low
+      
+      standard_stepper:
+        step_pin: i2so.4 
+        direction_pin: i2so.3
+        disable_pin: i2so.5
+    
+  Y:
+    steps_per_mm: 800
+    max_rate_mm_per_min: 3000
+    acceleration_mm_per_sec2: 25
+    max_travel_mm: 800
+    homing:
+      cycle: 2
+      mpos_mm: 10
+      positive_direction: false
+
+    motor0:
+      limit_neg_pin: gpio.35:low
+     
+      standard_stepper:
+        step_pin: i2so.7
+        direction_pin: i2so.6
+        disable_pin: i2so.8
+    
+  Z:
+    steps_per_mm: 800
+    max_rate_mm_per_min: 2000
+    acceleration_mm_per_sec2: 25
+    max_travel_mm: 120
+    homing:
+      cycle: 1
+      mpos_mm: 10
+      positive_direction: true
+
+    motor0:
+      limit_neg_pin: gpio.34:low
+      
+      standard_stepper:
+        step_pin: i2so.10
+        direction_pin: i2so.9
+        disable_pin: i2so.11
